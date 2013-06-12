@@ -1,0 +1,9 @@
+### First line is a comment!!!
+
+VarA = 123 # comments
+VarB = 456.78
+VarC = #invalid!!
+
+# Bye Bye
+VarLast = Superman
+= Batman
