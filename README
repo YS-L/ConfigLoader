@@ -1,0 +1,5 @@
+ConfigLoader - A minimalistic configuration / parameter reader.
+
+See config.txt and main.cpp for an example.
+
+- Yung-Siang Liau (liauys@gmail.com)

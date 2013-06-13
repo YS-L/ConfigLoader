@@ -33,10 +33,7 @@ class ConfigLoader
 			if(it == mVarMap.end()){
 				throw KeyError();
 			}
-			std::string var_str = it->second;
-			std::ostringstream oss;
-			oss << var_str;
-			std::istringstream iss(oss.str());
+			std::istringstream iss(it->second);
 			T val;
 			iss >> val;
 			return val;
