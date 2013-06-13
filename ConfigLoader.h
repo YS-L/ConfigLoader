@@ -4,8 +4,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <vector>
 #include <map>
-#include <utility>
 #include <fstream>
 #include <sstream>
 #include <exception>
@@ -17,19 +17,19 @@
 
 class ConfigLoader
 {
-public:
+	public:
 		ConfigLoader(const std::string& ConfigFileName);
 		ConfigLoader(const std::ifstream& FileInStream);
 		void parse();
 
 		/// Read the value associated with key
 		template<class T>
-		T getVal(std::string key)
+		T getVal(const std::string& key)
 		{
 			if(!mParsed){
 				parse();
 			}
-			std::map<std::string, std::string>::iterator it = mVarMap.find(key);
+			container_iter it = mVarMap.find(key);
 			if(it == mVarMap.end()){
 				throw KeyError();
 			}
@@ -44,7 +44,7 @@ public:
 
 		/// Read the value associated with key, if key not found return default_val
 		template<class T>
-		T getVal(T default_val, std::string key)
+		T getVal(T default_val, const std::string& key)
 		{
 			try{
 				return getVal<T>(key);
@@ -52,6 +52,39 @@ public:
 			catch(KeyError){
 				return default_val;
 			}
+		};
+
+		/// Read the values associated with key as a vector
+		template<class T>
+		std::vector<T> getVector(const std::string& key)
+		{
+			if(!mParsed){
+				parse();
+			}
+			container_iter it = mVarMap.find(key);
+			if(it == mVarMap.end()){
+				throw KeyError();
+			}
+			std::istringstream iss(it->second);
+			std::vector<T> vec;
+			T val;
+			while(iss >> val){
+				vec.push_back(val);
+			}
+			return vec;
+		};
+
+		/// Read strings with spaces
+		std::string getString(const std::string& key)
+		{	
+			if(!mParsed){
+				parse();
+			}
+			container_iter it = mVarMap.find(key);
+			if(it == mVarMap.end()){
+				throw KeyError();
+			}
+			return it->second;
 		};
 
 		class KeyError: public std::exception
@@ -78,10 +111,15 @@ public:
 			}
 		};
 
-private:
+	private:
+		typedef std::map<std::string, std::string> container_type;
+		typedef container_type::iterator container_iter;
+
 		void take_content_snapshot(const std::istream& input);
+		std::string strip_head_tail(const std::string& str);
+
 		std::string mContent;
-		std::map<std::string, std::string> mVarMap;
+		container_type mVarMap;
 		bool mParsed;
 };
 

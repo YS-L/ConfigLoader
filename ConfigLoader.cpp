@@ -68,11 +68,12 @@ void ConfigLoader::parse()
 		// Strip off whitespace for keys and values
 		// TODO: Let value have spaces, strip off only trailing and leading spaces.
 		key.erase(remove_if(key.begin(), key.end(), ::isspace), key.end());
-		value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());
+		//value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());
+		value = strip_head_tail(value);
 #if CONFIG_LOADER_VERBOSE
-		cout << "Extracted key = " << key << ", value = " << value << endl;
+		cout << "Extracted key = " << key << ", value = [" << value << "]" << endl;
 #endif
-
+		
 		if(key.size() == 0){
 			cout << "Ignoring orphaned value: " << value << endl;
 			continue;
@@ -85,4 +86,18 @@ void ConfigLoader::parse()
 		mVarMap.insert(make_pair(key, value));
 	}
 	mParsed = true;
+}
+
+/// Strips off leading and trailing spaces
+string ConfigLoader::strip_head_tail(const string& str){
+	size_t len = str.size();
+	size_t from_pos = 0;
+	while(from_pos < len && str[from_pos]==' '){
+		from_pos++;
+	}
+	size_t to_pos = len - 1;
+	while(to_pos >= 0 && str[to_pos]==' '){
+		to_pos--;
+	}
+	return str.substr(from_pos, to_pos - from_pos + 1);
 }
